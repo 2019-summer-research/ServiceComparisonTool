@@ -34,6 +34,8 @@ public class GuiMain {
 	private JLabel datasetStatusDialog;
 	private JLabel azureTraining;
 	private JLabel azureConfidence;
+	private JLabel awsConfidence;
+	private JLabel awsTraining;
 	private JButton IdentifyImage;
 	private JButton StartupFormButton;
 	private JButton trainButton;
@@ -116,6 +118,12 @@ public class GuiMain {
 				trainAzure();
 				this.azureTraining.setText("Azure Trained");
 				this.azureTraining.setForeground(Color.GREEN);
+
+				this.awsTraining.setText("AWS Training..");
+				this.awsTraining.setForeground(Color.BLUE);
+				trainAws();
+				this.awsTraining.setText("AWS Trained");
+				this.awsTraining.setForeground(Color.GREEN);
 				this.isTrained = true;
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -205,14 +213,16 @@ public class GuiMain {
 		DetectFaces DF = new DetectFaces();
 		String[] args = {"",face.getAbsolutePath()};
 		BufferedImage FaceWithBounding = DF.run(args);
-		Float Confindence = 0.0f;
-		String NameGuess = "NoName";
+		Float Confindence;
+		String NameGuess;
 		SearchFacesByImage SF = new SearchFacesByImage();
 		String[] args2 = {"",ClassID,face.getAbsolutePath()};
 		NameGuess = SF.run(args2);
 		Confindence = SF.confidence;
 
-
+		awsConfidence.setText("AWS Image Confidence - " + Confindence + " - " + NameGuess);
+		Icon icon = new ImageIcon(FaceWithBounding);
+		topImageLabel.setIcon(icon);
 
 	}
 
