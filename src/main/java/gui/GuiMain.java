@@ -1,12 +1,21 @@
 package gui;
 
 import api.ViewportInterface;
+
+import com.apientry.api.DetectFaces;
+import com.apientry.api.collections.CreateCollection;
+import com.apientry.api.faces.IndexFaces;
+import com.apientry.api.faces.SearchFacesByImage;
 import com.datasetinterface.DatasetInterface;
+import com.datasetinterface.elements.PersonElement;
 import com.datasetinterface.exceptions.DirectorySelectionException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+
+import static gui.Utilities.generateString;
 
 public class GuiMain {
 	private JPanel panel1;
@@ -23,7 +32,7 @@ public class GuiMain {
 
 	ViewportInterface AwsInterface;
 	ViewportInterface AzureInterface;
-
+	String ClassID = "NOCLASS";
 
 	/**
 	 * Directory File which contains the dataset which is being handled by the system at the moment
@@ -101,6 +110,18 @@ public class GuiMain {
 	 */
 	private void trainAws() {
 
+		ClassID = generateString(6);
+		CreateCollection CC = new CreateCollection();
+		String[] args = {"",ClassID};
+		CC.run(args);
+		IndexFaces IF = new IndexFaces();
+
+		for (PersonElement pe : dataInterface.getDatasetList())
+		{
+			pe.getImages().get(0);
+			String[] arg = {"",pe.getImages().get(0).getAbsolutePath()};
+			IF.run(arg);
+		}
 	}
 
 	/**
@@ -108,6 +129,17 @@ public class GuiMain {
 	 * @param face
 	 */
 	private void identifyFaceAws(File face) {
+		DetectFaces DF = new DetectFaces();
+		String[] args = {"",face.getAbsolutePath()};
+		BufferedImage FaceWithBounding = DF.run(args);
+		Float Confindence = 0.0f;
+		String NameGuess = "NoName";
+		SearchFacesByImage SF = new SearchFacesByImage();
+		String[] args2 = {"",ClassID,face.getAbsolutePath()};
+		NameGuess = SF.run(args2);
+		Confindence = SF.confidence;
+
+
 
 	}
 
