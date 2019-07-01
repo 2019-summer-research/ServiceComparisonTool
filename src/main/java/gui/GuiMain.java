@@ -247,6 +247,9 @@ public class GuiMain {
 				.identifyFaces(element.getFaceId(), azurePackage.currentPersonGroupId);
 
 		// Set confidence
-		azureConfidence.setText("Azure Image Confidence - " + identity.get(0).getConfidence());
+		if(identity.isEmpty())
+			azureConfidence.setText("Azure Image Confidence - No match found");
+		else
+			azureConfidence.setText("Azure Image Confidence - " + identity.get(0).getConfidence());
 	}
 }
