@@ -1,9 +1,8 @@
 package gui;
 
+import api.ViewportInterface;
 import com.AzureInterface.api.endpoint.FacialDetection.FaceDetectionResponseElement;
 import com.AzureInterface.api.endpoint.Identify.IdentifyResponseElement;
-import api.ViewportInterface;
-
 import com.apientry.api.DetectFaces;
 import com.apientry.api.collections.CreateCollection;
 import com.apientry.api.faces.IndexFaces;
@@ -42,14 +41,8 @@ public class GuiMain {
 
 	static GuiMain instance;
 
-	ViewportInterface AwsInterface;
-	ViewportInterface AzureInterface;
 	String ClassID = "NOCLASS";
 
-	/**
-	 * Directory File which contains the dataset which is being handled by the system at the moment
-	 */
-	File datasetDirectory;
 
 	DatasetInterface dataInterface;
 
@@ -246,10 +239,36 @@ public class GuiMain {
 		ArrayList<IdentifyResponseElement> identity = (ArrayList<IdentifyResponseElement>) azurePackage.azureAdapter
 				.identifyFaces(element.getFaceId(), azurePackage.currentPersonGroupId);
 
-		// Set confidence
-		if(identity.isEmpty())
-			azureConfidence.setText("Azure Image Confidence - No match found");
-		else
-			azureConfidence.setText("Azure Image Confidence - " + identity.get(0).getConfidence());
+		// If we're confident that it is someone, get their name
+		if(!identity.isEmpty() && identity.get(0).getConfidence() > 0.3) {
+			String name = azurePackage.azureAdapter.getPersonFromPersonId(azurePackage.currentPersonGroupId,
+					identity.get(0).getID()).getName();
+
+			azureConfidence.setText("Azure Image Confidence - " + identity.get(0).getConfidence() + " - " + name);
+
+			// Try to set the database image with the given name
+			File origImage = getOrigFaceFromName(name);
+			if(origImage == null) {
+				return;
+			}
+
+			Icon origIcon = new ImageIcon(ImageIO.read(origImage));
+			origImageLabel.setIcon(origIcon);
+		}
+		else {
+			azureConfidence.setText("Azure Image Confidence - No match Found");
+			origImageLabel.setIcon(null);
+		}
+	}
+
+	private File getOrigFaceFromName(String name) {
+		name = name.toLowerCase();
+		for(PersonElement person : dataInterface.getDatasetList()) {
+			if(person.getPersonId().toLowerCase().equals(name)) {
+				return person.getImages().get(0);
+			}
+		}
+
+		return null;
 	}
 }
