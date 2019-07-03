@@ -1,6 +1,5 @@
 package gui;
 
-import api.ViewportInterface;
 import com.AzureInterface.api.endpoint.FacialDetection.FaceDetectionResponseElement;
 import com.AzureInterface.api.endpoint.Identify.IdentifyResponseElement;
 import com.apientry.api.DetectFaces;
@@ -193,7 +192,7 @@ public class GuiMain {
 		for (PersonElement pe : dataInterface.getDatasetList())
 		{
 			pe.getImages().get(0);
-			String[] arg = {"",pe.getImages().get(0).getAbsolutePath()};
+			String[] arg = {"",ClassID,pe.getImages().get(0).getAbsolutePath()};
 			IF.run(arg);
 		}
 	}
